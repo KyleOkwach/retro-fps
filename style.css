@@ -1,0 +1,38 @@
+* {
+    box-sizing: border-box;
+    color: #fff;
+}
+
+body {
+    background-color: #000;
+}
+
+/* Common */
+.flex {
+    display:flex;
+    height: 100vh;
+}
+
+.flex_h {
+    flex-direction: row;
+}
+
+.flex_v {
+    flex-direction: column;
+}
+
+.center {
+    justify-content: center;
+    align-items: center;
+}
+
+.display {
+    gap: 15px;
+    padding: 5px;
+}
+
+/* IDs */
+#stats {
+    font-family: monospace;
+    position: fixed;
+}
