@@ -20,3 +20,12 @@ utils.lerp = (xi, yi, x, d) => {
 utils.degsToRads = (deg) => {
     return (deg * (Math.PI / 180));
 }
+
+utils.distance = (x1, y1, x2, y2) => {
+    distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    return distance;
+}
+
+utils.textOutput = (container, label, text) => {
+    container.innerText = `${label}: ${text}`;
+}

@@ -7,14 +7,14 @@ class Player {
         this.angle = angle;
         this.controls = controls;
 
-        this.speed = 10.0;
+        this.speed = 5.0;
     }
 
     update() {
-        this.#physicsUpdate();
+        this.#movement();
     }
 
-    #physicsUpdate() {
+    #movement() {
         // movement
         if(this.controls.left) {
             this.angle -= 0.03;
@@ -37,12 +37,12 @@ class Player {
 
         // strafing
         if(this.controls.strafeRight) {
-            this.x += dx;
-            this.y -= dy;
+            this.x += dy;
+            this.y -= dx;
         }
         if(this.controls.strafeLeft) {
-            this.x -= dx;
-            this.y += dy;
+            this.x -= dy;
+            this.y += dx;
         }
 
         // looking

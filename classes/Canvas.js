@@ -10,6 +10,7 @@ class Canvas {
         this.canvas.style = `
             background-color: ${color};
         `
+        this.ctx = this.canvas.getContext("2d");
 
         container.appendChild(this.canvas);
     }

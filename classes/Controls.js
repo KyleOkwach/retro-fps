@@ -6,11 +6,14 @@ class Controls {
         this.left = false;
         this.right = false;
 
-        // movement
+        // looking
         this.lookUp = false;
         this.lookDown = false;
         this.lookLeft = false;
         this.lookRight = false;
+
+        // physics
+        this.jump = false;
 
         //strafing
         this.strafeLeft = false;
@@ -66,10 +69,10 @@ class Controls {
 
                 //strafing
                 case "ArrowLeft":
-                    this.strafeRight = true;
+                    this.strafeLeft = true;
                     break;
                 case "ArrowRight":
-                    this.strafeLeft = true;
+                    this.strafeRight = true;
                     break;
             }
         }
@@ -116,10 +119,10 @@ class Controls {
                     break;
                     
                 case "ArrowLeft":
-                    this.strafeRight = false;
+                    this.strafeLeft = false;
                     break;
                 case "ArrowRight":
-                    this.strafeLeft = false;
+                    this.strafeRight = false;
                     break;
             }
         }
