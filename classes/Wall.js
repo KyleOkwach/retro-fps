@@ -6,7 +6,6 @@ class Wall {
         this.sector = sector;
         this.wall = wall;
         this.color = utils.colors[this.wall.color] || color;
-        // this.color = color;
 
         // initial player coordinates
         this.pX = this.player.x;
