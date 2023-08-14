@@ -62,7 +62,6 @@ class Game {
             this.sectors[s].we = this.loadSectors[s].we;
             this.sectors[s].z1 = this.loadSectors[s].z1;  // sector bottom height
             this.sectors[s].z2 = this.loadSectors[s].z2 - this.loadSectors[s].z1; // sector top height
-
         }
 
         this.#mapGen();
@@ -74,31 +73,63 @@ class Game {
         this.canvas.update();
         this.player.update();
     
+        this.#sortSectors();
         this.#updateWalls()
     }
 
     #mapGen() {
         for(let s = 0; s < this.sectors.length; s++) {
+            this.sectors[s].d = 0;
             for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
                 // append walls to an array
                 this.walls[w] = new Wall(this.ctx, this.player, this.sectors[s], this.loadWalls[w]);
+
+                this.#sectDistance(s, w);
             }
         }
     }
 
+    // walls
     #loadWalls() {
         // load wall values
-        for(let w = 0; w < this.walls.length; w++) {
-            // append walls to an array
-            this.walls[w].draw3D(this.ctx);
+        for(let s = 0; s < this.sectors.length; s++) {
+            for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
+                // append walls to an array
+                this.walls[w].draw3D(this.ctx);
+                this.#sectDistance(s, w);
+            }
         }
     }
 
     #updateWalls() {
         // load wall values
-        for(let w = 0; w < this.walls.length; w++) {
-            // append walls to an array
-            this.walls[w].update(this.player);
+        for(let s = 0; s < this.sectors.length; s++) {
+            for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
+                // append walls to an array
+                this.walls[w].update(this.player);
+                this.#sectDistance(s, w);
+            }
         }
+    }
+
+    // sectors
+    #sortSectors() {
+        const numSect = this.sectors.length;
+
+        // order sectors by distance
+        for(let s = 0; s < numSect; s++) {
+            for(let w = 0; w < numSect - s - 1; w++) {
+                if(this.sectors[w].d < this.sectors[w + 1].d) {
+                    const st = this.sectors[w]; // temporary sector for sorting
+                    this.sectors[w] = this.sectors[w + 1];
+                    this.sectors[w + 1] = st;
+                }
+            }
+        }
+    }
+
+    #sectDistance(s, w) {
+        // updates the sector distance
+        this.sectors[s].d = this.walls[w].wallDist;
     }
 }

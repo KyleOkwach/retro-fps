@@ -49,80 +49,94 @@ class Wall {
     }
 
     draw3D(ctx) {
-        // wall vertices
-        for(let i = 0; i < this.points; i++) {
-            // offset points by player
-            const oX1 = this.pointOffsets[i].x - this.pX;
-            const oX2 = this.pointOffsets[i].x - this.pX;
+        for(let face = 1; face <= 2; face++) {
+            // wall vertices
+            for(let i = 0; i < this.points; i++) {
+                // offset points by player
+                let oX1 = this.pointOffsets[i].x - this.pX;
+                let oX2 = this.pointOffsets[i].x - this.pX;
+    
+                let oY1 = this.pointOffsets[i].y - this.pY;
+                let oY2 = this.pointOffsets[i].y - this.pY;
+                let swap = oX1;
 
-            const oY1 = this.pointOffsets[i].y - this.pY;
-            const oY2 = this.pointOffsets[i].y - this.pY;
+                // if(face == 1) {
+                //     // swap x
+                //     oX1 = oX2;
+                //     oX2 = swap;
+
+                //     // swap y
+                //     swap = oY1;
+                //     oY1 = oX2;
+                //     oY2 = swap;
+                // }
+                
+                // rotate points around world origin
+                this.coords.x1[i] = oX1 * this.Cos - oY1 * this.Sin;  // world X position
+                this.coords.x2[i] = oX2 * this.Cos - oY2 * this.Sin;
+    
+                this.coords.y1[i] = oY1 * this.Cos + oX1 * this.Sin;  // world Y position
+                this.coords.y2[i] = oY2 * this.Cos + oX2 * this.Sin;
+    
+                this.coords.z1[i] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[i]/32));  // world Z position
+                this.coords.z2[i] = this.coords.z1[i] + this.sector.z2;  // z coordinates for second line
+            }
             
-            // rotate points around world origin
-            this.coords.x1[i] = oX1 * this.Cos - oY1 * this.Sin;  // world X position
-            this.coords.x2[i] = oX2 * this.Cos - oY2 * this.Sin;
-
-            this.coords.y1[i] = oY1 * this.Cos + oX1 * this.Sin;  // world Y position
-            this.coords.y2[i] = oY2 * this.Cos + oX2 * this.Sin;
-
-            this.coords.z1[i] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[i]/32));  // world Z position
-            this.coords.z2[i] = this.coords.z1[i] + this.sector.z2;  // z coordinates for second line
+            this.wallDist = utils.distance(
+                0, 0,
+                (this.coords.x1[0] + this.coords.x1[1])/2,
+                (this.coords.y1[0] + this.coords.y1[1])/2
+            );  //store the wall distance
+    
+            if(this.coords.y1[0] < 1 && this.coords.y1[1] < 1) { return; }  // if points are behind the player
+    
+            // if first point is behind the player
+            if(this.coords.y1[0] < 1) {
+                this.bottom = this.#clipBehindPlayer(this.coords.x1[0], this.coords.y1[0], this.coords.z1[0], this.coords.x1[1], this.coords.y1[1], this.coords.z1[1]);  // bottom line
+                this.coords.x1[0] = this.bottom[0];
+                this.coords.y1[0] = this.bottom[1];
+                this.coords.z1[0] = this.bottom[2];
+    
+                this.top = this.#clipBehindPlayer(this.coords.x2[0], this.coords.y2[0], this.coords.z2[0], this.coords.x2[1], this.coords.y2[1], this.coords.z2[1]);  // top line
+                this.coords.x2[0] = this.top[0];
+                this.coords.y2[0] = this.top[1];
+                this.coords.z2[0] = this.top[2];
+            }
+    
+            if(this.coords.y1[1] < 1) {
+                this.#clipBehindPlayer(this.coords.x1[1], this.coords.y1[1], this.coords.z1[1], this.coords.x1[0], this.coords.y1[0], this.coords.z1[0]);  // bottom line
+                this.coords.x1[1] = this.bottom[0];
+                this.coords.y1[1] = this.bottom[1];
+                this.coords.z1[1] = this.bottom[2];
+    
+                this.#clipBehindPlayer(this.coords.x2[1], this.coords.y2[1], this.coords.z2[1], this.coords.x2[0], this.coords.y2[0], this.coords.z2[0]);  // top line
+                this.coords.x2[1] = this.top[0];
+                this.coords.y2[1] = this.top[1];
+                this.coords.z2[1] = this.top[2];
+            }
+            
+            for(let i = 0; i < this.points; i++) {
+                this.coords.x1[i] = this.coords.x1[i] * settings.FOV/this.coords.y1[i] + settings.screenW/2;  // bottom coordinate
+                this.coords.x2[i] = this.coords.x2[i] * settings.FOV/this.coords.y2[i] + settings.screenW/2;  // top coordinate
+    
+                this.coords.y1[i] = this.coords.z1[i] * settings.FOV/this.coords.y1[i] + settings.screenH/2;
+                this.coords.y2[i] = this.coords.z2[i] * settings.FOV/this.coords.y2[i] + settings.screenH/2;
+    
+                this.coords.z1[i] = this.coords.z1[i];
+                this.coords.z2[i] = this.coords.z2[i];
+            }
+    
+            // DRAWING POINTS
+            this.#drawWall(ctx, this.coords.x1, this.coords.y1, this.coords.y2);
+            this.wallDist /= this.sector.we - this.sector.ws;  // average sector distance
         }
-        
-        this.wallDist = utils.distance(
-            0, 0,
-            (this.coords.x1[0] + this.coords.x1[1])/2,
-            (this.coords.y1[0] + this.coords.y1[1])/2
-        );  //store the wall distance
-
-        if(this.coords.y1[0] < 1 && this.coords.y1[1] < 1) { return; }  // if points are behind the player
-
-        // if first point is behind the player
-        if(this.coords.y1[0] < 1) {
-            this.bottom = this.#clipBehindPlayer(this.coords.x1[0], this.coords.y1[0], this.coords.z1[0], this.coords.x1[1], this.coords.y1[1], this.coords.z1[1]);  // bottom line
-            this.coords.x1[0] = this.bottom[0];
-            this.coords.y1[0] = this.bottom[1];
-            this.coords.z1[0] = this.bottom[2];
-
-            this.top = this.#clipBehindPlayer(this.coords.x2[0], this.coords.y2[0], this.coords.z2[0], this.coords.x2[1], this.coords.y2[1], this.coords.z2[1]);  // top line
-            this.coords.x2[0] = this.top[0];
-            this.coords.y2[0] = this.top[1];
-            this.coords.z2[0] = this.top[2];
-        }
-
-        if(this.coords.y1[1] < 1) {
-            this.#clipBehindPlayer(this.coords.x1[1], this.coords.y1[1], this.coords.z1[1], this.coords.x1[0], this.coords.y1[0], this.coords.z1[0]);  // bottom line
-            this.coords.x1[1] = this.bottom[0];
-            this.coords.y1[1] = this.bottom[1];
-            this.coords.z1[1] = this.bottom[2];
-
-            this.#clipBehindPlayer(this.coords.x2[1], this.coords.y2[1], this.coords.z2[1], this.coords.x2[0], this.coords.y2[0], this.coords.z2[0]);  // top line
-            this.coords.x2[1] = this.top[0];
-            this.coords.y2[1] = this.top[1];
-            this.coords.z2[1] = this.top[2];
-        }
-        
-        for(let i = 0; i < this.points; i++) {
-            this.coords.x1[i] = this.coords.x1[i] * settings.FOV/this.coords.y1[i] + settings.screenW/2;  // bottom coordinate
-            this.coords.x2[i] = this.coords.x2[i] * settings.FOV/this.coords.y2[i] + settings.screenW/2;  // top coordinate
-
-            this.coords.y1[i] = this.coords.z1[i] * settings.FOV/this.coords.y1[i] + settings.screenH/2;
-            this.coords.y2[i] = this.coords.z2[i] * settings.FOV/this.coords.y2[i] + settings.screenH/2;
-
-            this.coords.z1[i] = this.coords.z1[i];
-            this.coords.z2[i] = this.coords.z2[i];
-        }
-
-        // DRAWING POINTS
-        this.#drawWall(ctx, this.coords.x1, this.coords.y1, this.coords.y2);
-        this.wallDist /= this.sector.we - this.sector.ws;  // average sector distance
     }
 
     #clipBehindPlayer(x1, y1, z1, x2, y2, z2) {
         // To prevent weird bahaviour when wall is partially behind the player
         const da = y1;  // distance plane for point a
         const db = y2;  // distance plane for point b
-        const d = da - db; if(d == 0) { d = 1; }
+        // const d = da - db; if(d == 0) { d = 1; }
 
         const s = da / (da - db);  // intersection factor(between 0 and 1)
 
