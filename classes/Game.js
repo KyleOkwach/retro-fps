@@ -82,7 +82,7 @@ class Game {
             this.sectors[s].d = 0;
             for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
                 // append walls to an array
-                this.walls[w] = new Wall(this.ctx, this.player, this.sectors[s], this.loadWalls[w]);
+                this.walls[w] = new Wall(this.ctx, this.player, this.sectors[s], this.loadWalls[w].x1, this.loadWalls[w].x2, this.loadWalls[w].y1, this.loadWalls[w].y2, this.loadWalls[w].color);
 
                 this.#sectDistance(s, w);
             }
@@ -94,9 +94,9 @@ class Game {
         // load wall values
         for(let s = 0; s < this.sectors.length; s++) {
             for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
-                // append walls to an array
+                // draw walls
                 this.walls[w].draw3D(this.ctx);
-                this.#sectDistance(s, w);
+                // this.#sectDistance(s, w);
             }
         }
     }
@@ -104,11 +104,25 @@ class Game {
     #updateWalls() {
         // load wall values
         for(let s = 0; s < this.sectors.length; s++) {
-            for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
-                // append walls to an array
-                this.walls[w].update(this.player);
-                this.#sectDistance(s, w);
-            }
+            // for(let face = 0; face < 2; face++) {
+                for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
+                    // update walls
+                    // if(face == 0) {
+                    //     // BACKFACE CULLING
+                    //     // swap x
+                    //     var swap = this.walls[w].x1;
+                    //     this.walls[w].x1 = this.walls[w].x2;
+                    //     this.walls[w].x2 = swap;
+    
+                    //     // swap y
+                    //     swap = this.walls[w].y1;
+                    //     this.walls[w].y1 = this.walls[w].y2;
+                    //     this.walls[w].y2 = swap;
+                    // }
+                    this.walls[w].update(this.player);
+                    this.#sectDistance(s, w);
+                }
+            // }
         }
     }
 
