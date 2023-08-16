@@ -104,25 +104,25 @@ class Game {
     #updateWalls() {
         // load wall values
         for(let s = 0; s < this.sectors.length; s++) {
-            // for(let face = 0; face < 2; face++) {
+            for(let face = 0; face < 2; face++) {
                 for(let w = this.sectors[s].ws; w < this.sectors[s].we; w++) {
                     // update walls
-                    // if(face == 0) {
-                    //     // BACKFACE CULLING
-                    //     // swap x
-                    //     var swap = this.walls[w].x1;
-                    //     this.walls[w].x1 = this.walls[w].x2;
-                    //     this.walls[w].x2 = swap;
+                    if(face == 0) {
+                        // BACKFACE CULLING
+                        // swap x
+                        var swap = this.walls[w].x1;
+                        this.walls[w].x1 = this.walls[w].x2;
+                        this.walls[w].x2 = swap;
     
-                    //     // swap y
-                    //     swap = this.walls[w].y1;
-                    //     this.walls[w].y1 = this.walls[w].y2;
-                    //     this.walls[w].y2 = swap;
-                    // }
+                        // swap y
+                        swap = this.walls[w].y1;
+                        this.walls[w].y1 = this.walls[w].y2;
+                        this.walls[w].y2 = swap;
+                    }
                     this.walls[w].update(this.player);
                     this.#sectDistance(s, w);
                 }
-            // }
+            }
         }
     }
 

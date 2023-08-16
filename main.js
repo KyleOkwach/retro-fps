@@ -10,7 +10,6 @@ const game = new Game(screenCanvas, controls);
 
 
 let msPrev = performance.now();  // elapsed time since oage loaded in ms
-const FPS = 60;
 const msPerFrame = 1000 / settings.FPS;
 
 let showFPS = true;

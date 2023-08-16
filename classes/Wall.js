@@ -7,6 +7,7 @@ class Wall {
         this.x1 = x1; this.x2 = x2;
         this.y1 = y1; this.y2 = y2;
         this.color = utils.colors[color];
+        this.bCulling = false;
 
         // initial player coordinates
         this.pX = this.player.x;
@@ -49,16 +50,17 @@ class Wall {
         for(let face = 0; face < 2; face++) {
             // WALL VERTICES
             // offset points by player
-            var oX1 = this.x1 - this.pX;
-            var oX2 = this.x2 - this.pX;
+            let oX1 = this.x1 - this.pX;
+            let oX2 = this.x2 - this.pX;
 
-            var oY1 = this.y1 - this.pY;
-            var oY2 = this.y2 - this.pY;
+            let oY1 = this.y1 - this.pY;
+            let oY2 = this.y2 - this.pY;
             
-            if(face == 0) {
+            let swap = 0;
+            if(face == 0 && this.bCulling) {
                 // BACKFACE CULLING
                 // swap x
-                var swap = oX1;
+                swap = oX1
                 oX1 = oX2;
                 oX2 = swap;
 
@@ -79,8 +81,8 @@ class Wall {
             this.coords.y2[0] = oY1 * this.Cos + oX1 * this.Sin;
             this.coords.y2[1] = oY2 * this.Cos + oX2 * this.Sin;
 
-            this.coords.z1[0] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[0]/32));  // world Z position
-            this.coords.z1[1] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[1]/32));
+            this.coords.z1[0] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[0]/64));  // world Z position
+            this.coords.z1[1] = this.sector.z1 - this.pZ + ((this.pL * this.coords.y1[1]/64));
             this.coords.z2[0] = this.coords.z1[0] + this.sector.z2;  // z coordinates for second line
             this.coords.z2[1] = this.coords.z1[1] + this.sector.z2;
             
@@ -167,7 +169,7 @@ class Wall {
             let y1 = utils.lerp(wX[0], wY1[0], x, grad1);
 
             let y2 = utils.lerp(wX[0], wY2[0], x, grad2);
-            
+
             // Y clipping
             if(y1 < 1) { y1 = 1 };
             if(y2 < 1) { y2 = 1 };
