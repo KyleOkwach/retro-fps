@@ -55,19 +55,17 @@ class Wall {
 
             let oY1 = this.y1 - this.pY;
             let oY2 = this.y2 - this.pY;
-            
-            let swap = 0;
-            if(face == 0 && this.bCulling) {
-                // BACKFACE CULLING
-                // swap x
-                swap = oX1
-                oX1 = oX2;
-                oX2 = swap;
 
-                // swap y
-                swap = oY1;
-                oY1 = oY2;
-                oY2 = swap;
+            if (face === 0 && this.bCulling) {
+                // swap vertices
+                let swap = 0;
+                swap = oX2;
+                oX2 = oX1;
+                oX1 = swap;
+
+                swap = oY2;
+                oY2 = oY1;
+                oY1 = swap;
             }
             
             // rotate points around world origin
@@ -122,16 +120,16 @@ class Wall {
             for(let i = 0; i < this.points; i++) {
                 this.coords.x1[i] = this.coords.x1[i] * settings.FOV/this.coords.y1[i] + settings.screenW/2;  // bottom coordinate
                 this.coords.x2[i] = this.coords.x2[i] * settings.FOV/this.coords.y2[i] + settings.screenW/2;  // top coordinate
-    
+                
                 this.coords.y1[i] = this.coords.z1[i] * settings.FOV/this.coords.y1[i] + settings.screenH/2;
                 this.coords.y2[i] = this.coords.z2[i] * settings.FOV/this.coords.y2[i] + settings.screenH/2;
-    
+                
                 this.coords.z1[i] = this.coords.z1[i];
                 this.coords.z2[i] = this.coords.z2[i];
             }
-    
-            // DRAWING POINTS
-            this.#drawWall(ctx, this.coords.x1, this.coords.y1, this.coords.y2);
+
+            this.#drawWall(ctx, this.coords.x1, this.coords.x2, this.coords.y1, this.coords.y2);
+            this.#drawWall(ctx, this.coords.x2, this.coords.x1, this.coords.y2, this.coords.y1);
             this.wallDist /= this.sector.we - this.sector.ws;  // average sector distance
         }
     }
@@ -154,29 +152,27 @@ class Wall {
         return [clippedX, clippedY, clippedZ];
     }
 
-    #drawWall(ctx, wX, wY1, wY2) {
-        const grad1 = (wY1[1]-wY1[0])/(wX[1] - wX[0]);
-        const grad2 = (wY2[1]-wY2[0])/(wX[1] - wX[0]);
+    #drawWall(ctx, wX1, wX2, wY1, wY2) {
+        const grad1 = (wY1[1]-wY1[0])/(wX1[1] - wX1[0]);
+        const grad2 = (wY2[1]-wY2[0])/(wX1[1] - wX1[0]);
 
         // X clipping
-        if(wX[0] < 1) { wX[0] = 1 };  // clip left
-        if(wX[1] < 1) { wX[1] = 1 };  // clip left
-        if(wX[0] > settings.screenW) { wX[0] = settings.screenW - 1; }  // clip right
-        if(wX[1] > settings.screenW) { wX[1] = settings.screenW - 1; }  // clip right
-        
-        // console.log(`[${wX}] [${wY1}] [${wY2}] grad: [${grad1}, ${grad2}]`)
-        for(let x = wX[0]; x <= wX[1]; x++) {
-            let y1 = utils.lerp(wX[0], wY1[0], x, grad1);
+        if(wX1[0] < 1) { wX1[0] = 1 };  // clip left
+        if(wX1[1] < 1) { wX1[1] = 1 };  // clip left
+        if(wX1[0] > settings.screenW) { wX1[0] = settings.screenW - 1; }  // clip right
+        if(wX1[1] > settings.screenW) { wX1[1] = settings.screenW - 1; }  // clip right
 
-            let y2 = utils.lerp(wX[0], wY2[0], x, grad2);
+        for(let x = wX1[0]; x <= wX1[1]; x++) {
+            let y1 = utils.lerp(wX1[0], wY1[0], x, grad1);
+
+            let y2 = utils.lerp(wX1[0], wY2[0], x, grad2);
 
             // Y clipping
             if(y1 < 1) { y1 = 1 };
             if(y2 < 1) { y2 = 1 };
             if(y1 > settings.screenH) { y1 = settings.screenH - 1 };
             if(y2 > settings.screenH) { y2 = settings.screenH - 1 };
-            
-            // console.log(y1, y2)
+
             for(let y = y1; y < y2; y++) {
                 if(x > 0 && x < settings.screenW && y > 0 && y < settings.screenH) {
                     utils.drawPixel(ctx, x, y, this.color, settings.pixelScale);
