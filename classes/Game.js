@@ -30,10 +30,10 @@ class Game {
         ];
         this.loadSectors = [
             // ws, we, z1, z2
-            { ws: 0, we: 4, z1: 0, z2:  40 },  // sector 1
-            { ws: 4, we: 8, z1: 0, z2:  40 },  // sector 2
-            { ws: 8, we: 12, z1:  0, z2:  40} ,  // sector 3
-            { ws: 12, we:16, z1: 0, z2: 40 },  // sector 4
+            { ws: 0, we: 4, z1: 0, z2:  40, c1: 0, c2: 1 },  // sector 1
+            { ws: 4, we: 8, z1: 0, z2:  40, c1: 2, c2: 3 },  // sector 2
+            { ws: 8, we: 12, z1:  0, z2:  40, c1: 4, c2: 5 } ,  // sector 3
+            { ws: 12, we:16, z1: 0, z2: 40, c1: 6, c2: 7 },  // sector 4
         ]
 
         this.walls = [];
